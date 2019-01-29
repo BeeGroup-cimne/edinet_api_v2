@@ -1,0 +1,114 @@
+<h3>REST service general documentation</h3>
+
+<h4>HTTP methods</h4>
+	<section>
+		<p>There are a maximum of 4 http methods to use with a resources or items</p>
+        <ul>
+            <li><h5>Item</h5>
+                <p>When using the method on an item it has to be identified with the specified field or with its _id</p>
+                <p>The acction will only affect the selected item</p>
+            </li>
+            <li><h5>Resource</h5>
+                <p>The action will affect all the items in this resource</p>
+            </li>
+        </ul>
+        <p>Each available resource will allow different methods for entire resource or a single item. It is specified for each resource in the summary below.</p>
+		<h4>Description of the methods</h4>
+        <ul>
+			<li>
+				<h5>GET</h5>
+				<p>Retrieves an item or list of items of resource</p>
+				<p>
+					<strong>Return value:</strong>
+					<ul>
+						<li>The document POSTed with mongoDB _id field and some fields that eve added automatically (created, updated, _etag and _links)</li>
+						<li>List of documents in case no identifier was provided</li>
+					</ul>
+				</p>
+				<p><strong>Example of usage:</strong></p>
+				<pre># curl -H 'Authorization: Token 0123456789' -i 'https://api.edinet.cimne.com/v1/contracts'
+# curl -H 'Authorization: Token 0123456789' -i 'https://api.edinet.cimne.com/v1/contracts/5265082ddfeb57340f75f39c'</pre>
+			</li>
+			<li>
+				<h5>POST</h5>
+				<p>Insert a new item or a list of items in a resource collection.</p>
+				<p>
+					<strong>Return value:</strong>
+					<ul>
+						<li>If POSTed a single item (list with a single item too): It will return a document with eve fields added</li>
+						<li>If a list is POSTed it will return an ordered list (<strong>corresponding to POST items order</strong>) with documents with eve fields added</li> 
+					</ul>	
+					<p>Take this document as return example (make it a list of documents for a POST with a list of items)</p>
+<pre>{
+    "_status": "OK",
+    "updated": "2013-11-07T12:10:08Z",
+    "_id": "527b8320dfeb5730e89647c4",
+    "_links": {
+        "self": {
+            "href": "/v1/contracts/527b8320dfeb5730e89647c4",
+            "title": "Contract"
+        }
+    },
+    "__etag": "d2209f5c83e9fcca2c6c4aa8697c0a6ca4500f06"
+}</pre>
+				</p>
+				<p><strong>Example of usage:</strong></p>
+				<p>It is important to add request header "Content-Type"</p>
+				<pre># curl -H 'Authorization: Token 0123456789' -H "Content-type: application/json" -d '{"companyId": 1234567890, "meteringPointId": "c1759810-90f3-012e-0404-34159e211070", "measurements": [{"timestamp": "2013-10-11T16:37:05Z", "type": "electricityConsumption", "value": 7.0}, {"timestamp": "2013-10-11T16:37:05Z", "type": "electricityKiloVoltAmpHours", "value": 11.0}], "deviceId": "c1810810-0381-012d-25a8-0017f2cd3574", "readings": [{"type": "electricityConsumption", "period": "INSTANT", "unit": "kWh"}, {"type": "electricityKiloVoltAmpHours", "period": "INSTANT", "unit": "kVArh"}]}' https://api.edinet.cimne.com/v1/amon_measures</pre>
+			</li>
+			<li>
+				<h5>PATCH</h5>
+				<p>Updates an item of resource</p>
+				<p>There is an important header we should add to PATCH an item. This is a field added automatically on item insertion to support concurrency control called "_etag".</p>
+				<p>To add this field we use request header "If-Match". Also add "Content-Type" as we do in POST</p>
+				<p>
+					<strong>Return value:</strong>
+					<ul>
+						<li>Same as POST a single document</li>
+					</ul>
+				</p>
+				<p><strong>Example of usage:</strong></p>
+				<pre># curl -H 'Authorization: Token 0123456789' -H "If-Match: 9ade506f8b918e00adc971cacfbca2e8939e40b3" -H "Content-Type: application/json" -X PATCH -i https://api.edinet.cimne.com/v1/contracts/5265082ddfeb57340f75f39c -d '{"power": 333}'</pre>
+			</li>
+			<li>
+				<h5>DELETE</h5>
+				<p>Deletes an item of resource</p>
+				<p>To add concurrency control we have to provide _etag field with "If-Match" request header as we do in PATCH</p>
+				<p>
+					<strong>Return value:</strong>
+					<ul>
+						<li>An empty document</li>
+					</ul>
+				</p>
+				<p><strong>Example of usage:</strong></p>
+				<pre># -H 'Authorization: Token 0123456789' -H "If-Match: 8b3cc004248b4fd418a5636d919c9af049dbc452" -X DELETE https://api.edinet.cimne.com/v1/contracts/52654a6adfeb574a537035f6</pre>
+			</li>
+		</ul>
+	</section>
+
+
+<h4>Filtering and sorting</h4>
+	<section>
+		<p>We support filter and sort on resources</p>
+		<ul>
+			<li>
+				<h5>Filtering</h5>
+				<pre># curl -H 'Authorization: Token 0123456789' -i 'https://api.edinet.cimne.com/v1/contracts/?where="dateStart"<"2013-10-11T16:37:05Z"'</pre>
+			</li>
+			<li>
+				<h5>Sort</h5>
+				<pre># curl -H 'Authorization: Token 0123456789' -i 'https://api.edinet.cimne.com/v1/contracts/?sort=[("dateStart", -1)]'</pre>
+			</li>
+		</ul>
+	</section>
+	
+<h4>Authentication</h4>
+	<section>
+		<p>To use the API, an authentication token is required</p>
+		<p>This authentication token will be provided by the @admins</p>
+		<p>The token must be included to each request in the headers</p>
+		<pre>'Authorization: Token <b>token_provided</b>'</pre>
+	</section>
+<div style="height:33px"></div>	
+
+<h3>Resources</h3>

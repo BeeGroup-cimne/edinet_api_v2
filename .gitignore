@@ -1,0 +1,6 @@
+vars.sh
+.idea/
+client.py
+venv/
+*.pyc
+__pycache__/

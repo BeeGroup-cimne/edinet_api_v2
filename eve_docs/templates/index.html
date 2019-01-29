@@ -1,0 +1,17 @@
+{% extends "bootstrap/base.html" %}
+
+{% block head -%}
+{{super()}}
+{% include 'evedocstyle.html' %}
+{%- endblock head %}
+{% block content %}
+<div class="container">
+    <div class="api">
+        <h1>{{ cfg['api_name'] }}</h1>
+        <h4>List API versions</h4>
+        <ul>
+            <li><a href="/v1/docs">V1</a></li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
