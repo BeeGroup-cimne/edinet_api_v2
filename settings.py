@@ -22,7 +22,8 @@ MONGO_USERNAME = os.environ['MONGO_USERNAME']
 MONGO_PASSWORD = os.environ['MONGO_PASSWORD']
 MONGO_DBNAME = os.environ['MONGO_DBNAME']
 
-SERVER_NAME = os.environ['SERVER_NAME']
+if os.environ['SERVER_NAME']:
+    SERVER_NAME = os.environ['SERVER_NAME']
 URL_PROTOCOL = os.environ['URL_PROTOCOL']
 RESOURCE_METHODS = ['GET', 'POST', 'DELETE']
 
