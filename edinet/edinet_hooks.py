@@ -156,3 +156,53 @@ class WeatherStationHooks(BaseHook):
         weather_station_hook = WeatherStationHooks(app.config['POSTAL_CODE_FILE'], app.config['DEFAULT_LATITUDE'], app.config['DEFAULT_LONGITUDE'], app.config['DEFAULT_ALTITUDE'])
         app.on_insert_modelling_units += weather_station_hook.add_weather_station()
         app.on_update_modelling_units += weather_station_hook.update_weather_station()
+
+class BuildingHourlyHook(BaseHook):
+    def get_resource(self):
+        def hourly_data_hook_building(response):
+            for resource in response['_items']:
+                modelling_units = resource['modellingUnits'] if 'modellingUnits' in resource else []
+                if not modelling_units:
+                    reporting_unit_doc = app.data.driver.db['reporting_units'].find_one({'buildingId': resource['buildingId']})
+                    if reporting_unit_doc and 'modelling_Units' in reporting_unit_doc:
+                        modelling_units = reporting_unit_doc['modelling_Units']
+                if not modelling_units:
+                    resource['hourlyData'] = False
+                    continue
+                hourly = []
+                for mu in modelling_units:
+                    baseline_doc = app.data.driver.db['baselines'].find_one({'modellingUnitId':mu})
+                    if baseline_doc:
+                        hourly.append(len(baseline_doc['timestamps']) > 0 if 'timestamps' in baseline_doc else False)
+                    else:
+                        hourly.append(False)
+                response['hourlyData'] = any(hourly)
+
+        return hourly_data_hook_building
+
+    def get_item(self):
+        def hourly_data_hook_building(response):
+            modelling_units = response['modellingUnits'] if 'modellingUnits' in response else []
+            if not modelling_units:
+                reporting_unit_doc = app.data.driver.db['reporting_units'].find_one({'buildingId': response['buildingId']})
+                if reporting_unit_doc and 'modelling_Units' in reporting_unit_doc:
+                    modelling_units = reporting_unit_doc['modelling_Units']
+            if not modelling_units:
+                response['hourlyData'] = False
+                return
+            hourly = []
+            for mu in modelling_units:
+                baseline_doc = app.data.driver.db['baselines'].find_one({'modellingUnitId':mu})
+                if baseline_doc:
+                    hourly.append(len(baseline_doc['timestamps']) > 0 if 'timestamps' in baseline_doc else False)
+                else:
+                    hourly.append(False)
+            response['hourlyData'] = any(hourly)
+
+        return hourly_data_hook_building
+
+    @staticmethod
+    def set_hooks(app):
+        b_hook = BuildingHourlyHook()
+        app.on_fetched_resource_buildings += b_hook.get_resource()
+        app.on_fetched_item_buildings += b_hook.get_item()
