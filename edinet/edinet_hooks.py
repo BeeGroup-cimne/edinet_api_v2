@@ -99,12 +99,11 @@ class WeatherStationHooks(BaseHook):
                 contract_altitude = self.GEOLOC_DEFAULT_ALTITUDE
         return contract_lat, contract_long, contract_altitude
 
-    def _calculate_closest_weather_station(self, postalCode, countryCode):
+    def _calculate_closest_weather_station(self, postalCode, countryCode, query):
         # find the gps position of the given info
         contract_lat, contract_long, contract_altitude = self._get_lan_long_alt_from_file(postalCode, countryCode)
         print(contract_lat, contract_long, contract_altitude)
         """ look for the closer weather station in a loop of weatherStation of mongo """
-        query = {}
         stations = app.data.driver.db['weather_stations'].find(query)
         dist = 1e19
         stationId="unknown"
@@ -125,30 +124,37 @@ class WeatherStationHooks(BaseHook):
 
         return stationId, dist
 
-    def _return_station_distance_from_doc(self, doc):
+    def _return_station_distance_from_doc(self, doc, query):
         # buscar station mes propera
         stationId = 'Unknown'
         distance = None
         if 'location' in doc:
             if 'postalCode' in doc['location'] and 'countryCode' in doc['location']:
                 stationId, distance = self._calculate_closest_weather_station(doc['location']['postalCode'],
-                                                                              doc['location']['countryCode'])
+                                                                              doc['location']['countryCode'],
+                                                                              query)
         return stationId, distance
 
     def add_weather_station(self):
         def add_weather_station_hook(documents):
             for doc in documents:
-                stationId, distance = self._return_station_distance_from_doc(doc)
+                stationId, distance = self._return_station_distance_from_doc(doc, {})
                 doc['stationId'] = stationId
                 doc['distance'] = distance
+                solar_station, distance_solar = self._return_station_distance_from_doc(doc, {"solar_station" : True})
+                doc['solar_station'] = solar_station
+                doc['distance_solar'] = distance_solar
         return add_weather_station_hook
 
     def update_weather_station(self):
         def update_weather_station_hook(updates, original):
             original.update(updates)
-            stationId, distance = self._return_station_distance_from_doc(original)
+            stationId, distance = self._return_station_distance_from_doc(original, {})
             updates['stationId'] = stationId
             updates['distance'] = distance
+            solar_station, distance_solar = self._return_station_distance_from_doc(original, {"solar_station": True})
+            updates['solar_station'] = solar_station
+            updates['distance_solar'] = distance_solar
         return update_weather_station_hook
 
     @staticmethod
