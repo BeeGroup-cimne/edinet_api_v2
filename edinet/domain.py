@@ -1,6 +1,6 @@
 from edinet.resources import companies, entities, buildings, league_table, reporting_units, \
     edinet_baseline, postal_codes, delete_measures, user_modelling_units, modelling_units, raw_data, \
-    billing_amon_measures, metering_amon_measures, monthly_aggregation, edinet_similar_groups_description
+    billing_amon_measures, metering_amon_measures, monthly_aggregation, benchmarking
 
 DOMAIN = {
     'companies': companies.companies,
@@ -22,5 +22,5 @@ DOMAIN = {
     'raw_data': raw_data.raw_data,
     'baselines': edinet_baseline.edinet_baseline,
     'monthly_aggregation': monthly_aggregation.monthly_aggregation,
-    'edinet_similar_groups_description': edinet_similar_groups_description.edinet_similar_groups_description
+    'benchmarking': benchmarking.benchmarking
 }
