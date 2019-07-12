@@ -21,6 +21,6 @@ DOMAIN = {
     # EDInet outputs
     'raw_data': raw_data.raw_data,
     'baselines': edinet_baseline.edinet_baseline,
-    'edinet_similar_groups_best_criteria': monthly_aggregation.edinet_similar_groups_best_criteria,
+    'montly_aggregation': monthly_aggregation.montly_aggregation,
     'edinet_similar_groups_description': edinet_similar_groups_description.edinet_similar_groups_description
 }
