@@ -115,7 +115,10 @@ class WeatherStationHooks(BaseHook):
                 except Exception:
                     print('error with station: {}'.format(station['stationId']))
                     continue
-                print(contract_long, contract_lat, long_dd, lat_dd)
+                print(contract_long)
+                print(contract_lat)
+                print(long_dd)
+                print(lat_dd)
                 new_dist = self._haversine(contract_long, contract_lat, long_dd, lat_dd)
 
                 if dist > new_dist:
