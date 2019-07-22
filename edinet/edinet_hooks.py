@@ -119,7 +119,7 @@ class WeatherStationHooks(BaseHook):
                 print(contract_lat)
                 print(long_dd)
                 print(lat_dd)
-                new_dist = self._haversine(contract_long, contract_lat, long_dd, lat_dd)
+                new_dist = self._haversine(float(contract_long), float(contract_lat), long_dd, lat_dd)
 
                 if dist > new_dist:
                     dist = new_dist
