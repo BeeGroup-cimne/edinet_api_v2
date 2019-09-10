@@ -50,5 +50,11 @@ monthly_aggregation = {
         'df': {
             'type': 'list'
         },
+        "anual_month" : {
+            'type': 'float',
+        },
+        "anual_value" : {
+            'type': 'float',
+        },
     }
 }
